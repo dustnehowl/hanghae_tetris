@@ -78,7 +78,7 @@ function rotate(matrix) {
     row.map((val, j) => matrix[N - j][i])
   );
 
-  return result;
+  return result; 
 }
 
 function hardDrop(){
@@ -188,6 +188,55 @@ function showGameOver() {
   });
 }
 
+// show the game pause screen
+function pauseGame(){
+  if (isAnimating) {
+    cancelAnimationFrame(rAF);
+    isAnimating = false; // 애니메이션 중지
+
+    context.fillStyle = 'black';
+    context.globalAlpha = 0.75;
+    context.fillRect(0, canvas.height / 2 - 30 - 50, canvas.width, 60);
+
+    context.globalAlpha = 1;
+    context.fillStyle = 'white';
+    context.font = '25px monospace';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('RESUME : Press P!', canvas.width / 2, canvas.height / 2 - 50);
+
+    context.fillStyle = 'black';
+    context.globalAlpha = 0.75;
+    context.fillRect(0, canvas.height / 2 - 30 + 50, canvas.width, 60);
+
+    context.globalAlpha = 1;
+    context.fillStyle = 'white';
+    context.font = '25px monospace';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('RESTART : Press R!', canvas.width / 2, canvas.height / 2 + 50);
+    
+    // // 스페이스바를 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
+    // document.addEventListener('keydown', function(e) {
+    //   if (e.which === 82) { // R을 누르면
+    //     restartGame(); // 게임 다시 시작
+    //     document.removeEventListener('keydown', arguments.callee); // 이벤트 핸들러 제거
+    //   }
+    // });
+
+    return;
+  }
+}
+
+// game 재개
+function resumeGame() {
+  if (!isAnimating) {
+    isAnimating = true; // 애니메이션 다시 시작
+    rAF = requestAnimationFrame(loop);
+    // 추가적인 재개 관련 작업 수행
+  }
+}
+
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const grid = 32;
@@ -261,48 +310,52 @@ let count = 0;
 let tetromino = getNextTetromino();
 let rAF = null;  // keep track of the animation frame so we can cancel it
 let gameOver = false;
+let isPaused = false;
+let isAnimating = true;
 
 // game loop
 function loop() {
-  rAF = requestAnimationFrame(loop);
-  context.clearRect(0,0,canvas.width,canvas.height);
+  if(isAnimating){
+    rAF = requestAnimationFrame(loop);
+    context.clearRect(0,0,canvas.width,canvas.height);
 
-  // draw the playfield
-  for (let row = 0; row < 20; row++) {
-    for (let col = 0; col < 10; col++) {
-      if (playfield[row][col]) {
-        const name = playfield[row][col];
-        context.fillStyle = colors[name];
-
-        // drawing 1 px smaller than the grid creates a grid effect
-        context.fillRect(col * grid, row * grid, grid-1, grid-1);
-      }
-    }
-  }
-
-  // draw the active tetromino
-  if (tetromino) {
-
-    // tetromino falls every 35 frames
-    if (++count > 35) {
-      tetromino.row++;
-      count = 0;
-
-      // place piece if it runs into anything
-      if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
-        tetromino.row--;
-        placeTetromino();
-      }
-    }
-
-    context.fillStyle = colors[tetromino.name];
-
-    for (let row = 0; row < tetromino.matrix.length; row++) {
-      for (let col = 0; col < tetromino.matrix[row].length; col++) {
-        if (tetromino.matrix[row][col]) {
+    // draw the playfield
+    for (let row = 0; row < 20; row++) {
+      for (let col = 0; col < 10; col++) {
+        if (playfield[row][col]) {
+          const name = playfield[row][col];
+          context.fillStyle = colors[name];
 
           // drawing 1 px smaller than the grid creates a grid effect
-          context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+          context.fillRect(col * grid, row * grid, grid-1, grid-1);
+        }
+      }
+    }
+
+    // draw the active tetromino
+    if (tetromino) {
+
+      // tetromino falls every 35 frames
+      if (++count > 35) {
+        tetromino.row++;
+        count = 0;
+
+        // place piece if it runs into anything
+        if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
+          tetromino.row--;
+          placeTetromino();
+        }
+      }
+
+      context.fillStyle = colors[tetromino.name];
+
+      for (let row = 0; row < tetromino.matrix.length; row++) {
+        for (let col = 0; col < tetromino.matrix[row].length; col++) {
+          if (tetromino.matrix[row][col]) {
+
+            // drawing 1 px smaller than the grid creates a grid effect
+            context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+          }
         }
       }
     }
@@ -323,11 +376,6 @@ document.addEventListener('keydown', function(e) {
     if (isValidMove(tetromino.matrix, tetromino.row, col)) {
       tetromino.col = col;
     }
-  }
-
-  // space keys (hard drop)
-  if (e.which === 32) {
-    hardDrop();
   }
 
   // up arrow key (rotate)
@@ -351,6 +399,21 @@ document.addEventListener('keydown', function(e) {
 
     tetromino.row = row;
   }
+
+  // space keys (hard drop)
+  if (e.which === 32) {
+    hardDrop();
+  }
+
+  // p key (pause and resume)
+  if (e.which === 80) {
+    if (isAnimating) {
+      pauseGame(); // 게임 일시 정지
+    } else {
+      resumeGame(); // 게임 재개
+    }
+  }
+
 });
 
 // start the game
