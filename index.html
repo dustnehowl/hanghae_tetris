@@ -81,6 +81,19 @@ function rotate(matrix) {
   return result;
 }
 
+function hardDrop(){
+  while(true){
+    tetromino.row++;
+    count = 0;
+    // place piece if it runs into anything
+    if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
+      tetromino.row--;
+      placeTetromino();
+      return;
+    }
+  }
+}
+
 // check to see if the new matrix/row/col is valid
 function isValidMove(matrix, cellRow, cellCol) {
   for (let row = 0; row < matrix.length; row++) {
@@ -136,6 +149,20 @@ function placeTetromino() {
   tetromino = getNextTetromino();
 }
 
+// restart game
+function restartGame() {
+  // 초기화 코드 추가
+  gameOver = false;
+  tetrominoSequence.length = 0;
+  for (let row = -2; row < 20; row++) {
+    for (let col = 0; col < 10; col++) {
+      playfield[row][col] = 0;
+    }
+  }
+  tetromino = getNextTetromino();
+  rAF = requestAnimationFrame(loop);
+}
+
 // show the game over screen
 function showGameOver() {
   cancelAnimationFrame(rAF);
@@ -151,6 +178,14 @@ function showGameOver() {
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillText('GAME OVER!', canvas.width / 2, canvas.height / 2);
+
+  // 스페이스바를 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
+  document.addEventListener('keydown', function(e) {
+    if (e.which === 82) { // 스페이스바 키를 누르면
+      restartGame(); // 게임 다시 시작
+      document.removeEventListener('keydown', arguments.callee); // 이벤트 핸들러 제거
+    }
+  });
 }
 
 const canvas = document.getElementById('game');
@@ -277,6 +312,7 @@ function loop() {
 // listen to keyboard events to move the active tetromino
 document.addEventListener('keydown', function(e) {
   if (gameOver) return;
+  console.log(e.which)
 
   // left and right arrow keys (move)
   if (e.which === 37 || e.which === 39) {
@@ -287,6 +323,11 @@ document.addEventListener('keydown', function(e) {
     if (isValidMove(tetromino.matrix, tetromino.row, col)) {
       tetromino.col = col;
     }
+  }
+
+  // space keys (hard drop)
+  if (e.which === 32) {
+    hardDrop();
   }
 
   // up arrow key (rotate)
