@@ -12,4 +12,4 @@ def start(name):
     return send_from_directory('html', name)
 
 if __name__ == "__main__":
-    app.run(debug = True, port = 80)
+    app.run(debug = True, port = 8000)
