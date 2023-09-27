@@ -366,43 +366,44 @@ function loop() {
 document.addEventListener('keydown', function(e) {
   if (gameOver) return;
   console.log(e.which)
+  if (isAnimating){
+    // left and right arrow keys (move)
+    if (e.which === 37 || e.which === 39) {
+      const col = e.which === 37
+        ? tetromino.col - 1
+        : tetromino.col + 1;
 
-  // left and right arrow keys (move)
-  if (e.which === 37 || e.which === 39) {
-    const col = e.which === 37
-      ? tetromino.col - 1
-      : tetromino.col + 1;
-
-    if (isValidMove(tetromino.matrix, tetromino.row, col)) {
-      tetromino.col = col;
-    }
-  }
-
-  // up arrow key (rotate)
-  if (e.which === 38) {
-    const matrix = rotate(tetromino.matrix);
-    if (isValidMove(matrix, tetromino.row, tetromino.col)) {
-      tetromino.matrix = matrix;
-    }
-  }
-
-  // down arrow key (drop)
-  if(e.which === 40) {
-    const row = tetromino.row + 1;
-
-    if (!isValidMove(tetromino.matrix, row, tetromino.col)) {
-      tetromino.row = row - 1;
-
-      placeTetromino();
-      return;
+      if (isValidMove(tetromino.matrix, tetromino.row, col)) {
+        tetromino.col = col;
+      }
     }
 
-    tetromino.row = row;
-  }
+    // up arrow key (rotate)
+    if (e.which === 38) {
+      const matrix = rotate(tetromino.matrix);
+      if (isValidMove(matrix, tetromino.row, tetromino.col)) {
+        tetromino.matrix = matrix;
+      }
+    }
 
-  // space keys (hard drop)
-  if (e.which === 32) {
-    hardDrop();
+    // down arrow key (drop)
+    if(e.which === 40) {
+      const row = tetromino.row + 1;
+
+      if (!isValidMove(tetromino.matrix, row, tetromino.col)) {
+        tetromino.row = row - 1;
+
+        placeTetromino();
+        return;
+      }
+
+      tetromino.row = row;
+    }
+
+    // space keys (hard drop)
+    if (e.which === 32) {
+      hardDrop();
+    }
   }
 
   // p key (pause and resume)
