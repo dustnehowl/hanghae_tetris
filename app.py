@@ -10,3 +10,6 @@ def index():
 @app.route("/<path:name>")
 def start(name):
     return send_from_directory('html', name)
+
+if __name__ == "__main__":
+    app.run(debug = True, port = 80)
