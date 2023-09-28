@@ -133,6 +133,8 @@ function placeTetromino() {
   // check for line clears starting from the bottom and working our way up
   for (let row = playfield.length - 1; row >= 0; ) {
     if (playfield[row].every(cell => !!cell)) {
+      score++;
+      console.log("score: " + score);
 
       // drop every row above this one
       for (let r = row; r >= 0; r--) {
@@ -166,6 +168,7 @@ function restartGame() {
   }
 
   count = 0;
+  score = 0;
   tetromino = getNextTetromino();
   nextTetromino = getNextTetromino();
   rAF = null;  // keep track of the animation frame so we can cancel it
@@ -185,14 +188,25 @@ function showGameOver() {
 
   context.fillStyle = 'black';
   context.globalAlpha = 0.75;
-  context.fillRect(0, canvas.height / 2 - 30, canvas.width, 60);
+  context.fillRect(0, canvas.height / 2 - 30 - 50, canvas.width, 60);
 
   context.globalAlpha = 1;
   context.fillStyle = 'white';
   context.font = '36px monospace';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.fillText('GAME OVER!', canvas.width / 2, canvas.height / 2);
+  context.fillText('GAME OVER!', canvas.width / 2, canvas.height / 2 - 50);
+
+  context.fillStyle = 'black';
+  context.globalAlpha = 0.75;
+  context.fillRect(0, canvas.height / 2 - 30 + 50, canvas.width, 60);
+
+  context.globalAlpha = 1;
+  context.fillStyle = 'white';
+  context.font = '36px monospace';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('SCORE: ' + score, canvas.width / 2, canvas.height / 2 + 50);
 
   // 스페이스바를 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
   document.addEventListener('keydown', function(e) {
@@ -352,6 +366,7 @@ let gameOver = false;
 let isPaused = false;
 let isAnimating = true;
 let isGameStart = false;
+let socre = 0;
 
 // game loop
 function loop() {
