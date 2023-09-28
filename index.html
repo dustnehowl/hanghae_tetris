@@ -21,7 +21,7 @@
   }
 
   #sidebar {
-    width: 200px;
+    width: 220px;
     height: 640px;
     margin-left: 10px;
     border: 1px solid white;
@@ -30,7 +30,7 @@
 </head>
 <body>
 <canvas width="320" height="640" id="game"></canvas>
-<canvas width="200" height="640" id="sidebar"></canvas>
+<canvas width="220" height="640" id="sidebar"></canvas>
 <script>
 // https://tetris.fandom.com/wiki/Tetris_Guideline
 
@@ -164,6 +164,7 @@ function placeTetromino() {
 function restartGame() {
   // 초기화 코드 추가
   gameOver = false;
+  startTime = performance.now(); // 게임 시작 시간 설정
   tetrominoSequence.length = 0;
   for (let row = -2; row < 20; row++) {
     for (let col = 0; col < 10; col++) {
@@ -377,6 +378,8 @@ let isPaused = false;
 let isAnimating = true;
 let isGameStart = false;
 let socre = 0;
+let startTime = 0;
+let time = 0;
 
 // game loop
 function loop() {
@@ -384,6 +387,13 @@ function loop() {
     rAF = requestAnimationFrame(loop);
     context.clearRect(0,0,canvas.width,canvas.height);
     sideContext.clearRect(0,0,canvas.width,canvas.height);
+
+    // 현재 시간을 가져와서 게임 시작 시간과의 차이를 계산합니다.
+    const currentTime = performance.now();
+    const elapsedTime = (currentTime - startTime) / 1000; // 밀리초를 초로 변환
+    
+    // 경과 시간을 화면에 표시합니다.
+    time = Math.floor(elapsedTime); // 정수로 변환하여 표시 (초 단위)
 
     // draw the playfield
     for (let row = 0; row < 20; row++) {
@@ -436,10 +446,27 @@ function loop() {
           if (nextTetromino.matrix[row][col]) {
 
             // drawing 1 px smaller than the grid creates a grid effect
-            sideContext.fillRect((col + 1)*grid, (3 + row) * grid, grid-1, grid-1);
+            sideContext.fillRect((col + 2)*grid, (3 + row) * grid, grid-1, grid-1);
           }
         }
       }
+    }
+
+    // draw NEXT, SCORE, TIME
+    if(isAnimating){
+      sideContext.globalAlpha = 1;
+      sideContext.fillStyle = 'white';
+      sideContext.font = '25px monospace';
+      sideContext.textAlign = 'center';
+      sideContext.textBaseline = 'middle';
+
+      let scoreTimeOffset = 100
+      sideContext.fillText('NEXT', sidebar.width / 2, 50);
+      sideContext.fillText('SCORE', sidebar.width / 2, sidebar.height / 2 + scoreTimeOffset);
+      sideContext.fillText(score, sidebar.width / 2, sidebar.height / 2 + 50 + scoreTimeOffset);
+
+      sideContext.fillText('TIME', sidebar.width / 2, sidebar.height / 2 + 100 + scoreTimeOffset);
+      sideContext.fillText(time, sidebar.width / 2, sidebar.height / 2 + 150 + scoreTimeOffset);
     }
 
   }
