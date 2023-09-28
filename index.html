@@ -203,6 +203,27 @@ function showGameOver() {
   });
 }
 
+function showMenu(){
+  context.fillStyle = 'black';
+  context.globalAlpha = 0.75;
+  context.fillRect(0, canvas.height / 2 - 30, canvas.width, 60);
+
+  context.globalAlpha = 1;
+  context.fillStyle = 'white';
+  context.font = '25px monospace';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('Press Enter to start', canvas.width / 2, canvas.height / 2);
+
+  // 엔터 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
+  document.addEventListener('keydown', function(e) {
+    if (e.which === 13) { // 엔터 키를 누르면
+      restartGame(); // 게임 다시 시작
+      document.removeEventListener('keydown', arguments.callee); // 이벤트 핸들러 제거
+    }
+  });
+}
+
 // show the game pause screen
 function pauseGame(){
   if (isAnimating) {
@@ -330,6 +351,7 @@ let rAF = null;  // keep track of the animation frame so we can cancel it
 let gameOver = false;
 let isPaused = false;
 let isAnimating = true;
+let isGameStart = false;
 
 // game loop
 function loop() {
@@ -353,8 +375,8 @@ function loop() {
     // draw the active tetromino
     if (tetromino) {
 
-      // tetromino falls every 35 frames
-      if (++count > 35) {
+      // tetromino falls every 60 frames
+      if (++count > 60) {
         tetromino.row++;
         count = 0;
 
@@ -435,8 +457,8 @@ document.addEventListener('keydown', function(e) {
 
 });
 
-// start the game
-rAF = requestAnimationFrame(loop);
+// show Menu
+showMenu();
 </script>
 </body>
 </html>
