@@ -146,7 +146,8 @@ function placeTetromino() {
     }
   }
 
-  tetromino = getNextTetromino();
+  tetromino = nextTetromino;
+  nextTetromino = getNextTetromino();
 }
 
 // restart game
@@ -159,7 +160,21 @@ function restartGame() {
       playfield[row][col] = 0;
     }
   }
+
+  while (tetrominoSequence.length != 0) {
+    tetrominoSequence.pop();
+  }
+
+  count = 0;
   tetromino = getNextTetromino();
+  nextTetromino = getNextTetromino();
+  rAF = null;  // keep track of the animation frame so we can cancel it
+  gameOver = false;
+  isPaused = false;
+  isAnimating = true;
+
+  tetromino = nextTetromino;
+  nextTetromino = getNextTetromino();
   rAF = requestAnimationFrame(loop);
 }
 
@@ -216,13 +231,15 @@ function pauseGame(){
     context.textBaseline = 'middle';
     context.fillText('RESTART : Press R!', canvas.width / 2, canvas.height / 2 + 50);
     
-    // // 스페이스바를 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
-    // document.addEventListener('keydown', function(e) {
-    //   if (e.which === 82) { // R을 누르면
-    //     restartGame(); // 게임 다시 시작
-    //     document.removeEventListener('keydown', arguments.callee); // 이벤트 핸들러 제거
-    //   }
-    // });
+    // R 를 눌렀을 때 다시 시작하도록 이벤트 핸들러 추가
+    document.addEventListener('keydown', function(e) {
+      if (e.which === 82) {
+        console.log("PRESSED R");
+        isAnimating = true;
+        restartGame();
+        document.removeEventListener('keydown', arguments.callee); // 이벤트 핸들러 제거
+      }
+    });
 
     return;
   }
@@ -308,6 +325,7 @@ const colors = {
 
 let count = 0;
 let tetromino = getNextTetromino();
+let nextTetromino = getNextTetromino();
 let rAF = null;  // keep track of the animation frame so we can cancel it
 let gameOver = false;
 let isPaused = false;
