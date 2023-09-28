@@ -7,5 +7,8 @@ WORKDIR /app
 # 호스트 머신의 현재 디렉토리에 있는 Flask 애플리케이션 코드를 컨테이너 내의 /app 디렉토리로 복사합니다.
 COPY . /app
 
+# 필요한 Python 패키지를 설치합니다.
+RUN pip install -r requirements.txt
+
 # Flask 애플리케이션을 실행합니다.
 CMD ["flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "8000"]
