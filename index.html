@@ -19,10 +19,18 @@
   canvas {
     border: 1px solid white;
   }
+
+  #sidebar {
+    width: 200px;
+    height: 640px;
+    margin-left: 10px;
+    border: 1px solid white;
+  }
   </style>
 </head>
 <body>
 <canvas width="320" height="640" id="game"></canvas>
+<canvas width="200" height="640" id="sidebar"></canvas>
 <script>
 // https://tetris.fandom.com/wiki/Tetris_Guideline
 
@@ -291,6 +299,8 @@ function resumeGame() {
 
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
+const sidebar = document.getElementById('sidebar');
+const sideContext = sidebar.getContext('2d');
 const grid = 32;
 const tetrominoSequence = [];
 
@@ -373,6 +383,7 @@ function loop() {
   if(isAnimating){
     rAF = requestAnimationFrame(loop);
     context.clearRect(0,0,canvas.width,canvas.height);
+    sideContext.clearRect(0,0,canvas.width,canvas.height);
 
     // draw the playfield
     for (let row = 0; row < 20; row++) {
@@ -414,6 +425,23 @@ function loop() {
         }
       }
     }
+
+    // draw the next tetromino
+    if(nextTetromino){
+      //
+      sideContext.fillStyle = colors[nextTetromino.name];
+
+      for (let row = 0; row < nextTetromino.matrix.length; row++) {
+        for (let col = 0; col < nextTetromino.matrix[row].length; col++) {
+          if (nextTetromino.matrix[row][col]) {
+
+            // drawing 1 px smaller than the grid creates a grid effect
+            sideContext.fillRect((col + 1)*grid, (3 + row) * grid, grid-1, grid-1);
+          }
+        }
+      }
+    }
+
   }
 }
 
