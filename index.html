@@ -142,7 +142,6 @@ function placeTetromino() {
   for (let row = playfield.length - 1; row >= 0; ) {
     if (playfield[row].every(cell => !!cell)) {
       score++;
-      console.log("score: " + score);
 
       // drop every row above this one
       for (let r = row; r >= 0; r--) {
@@ -183,9 +182,6 @@ function restartGame() {
   gameOver = false;
   isPaused = false;
   isAnimating = true;
-
-  tetromino = nextTetromino;
-  nextTetromino = getNextTetromino();
   rAF = requestAnimationFrame(loop);
 }
 
@@ -246,7 +242,7 @@ function pauseGame(){
 
     context.fillStyle = 'black';
     context.globalAlpha = 0.75;
-    context.fillRect(0, canvas.height / 2 - 30 - 50, canvas.width, 60);
+    context.fillRect(0, 0, canvas.width, 640);
 
     context.globalAlpha = 1;
     context.fillStyle = 'white';
@@ -285,7 +281,6 @@ function resumeGame() {
   if (!isAnimating) {
     isAnimating = true;
     rAF = requestAnimationFrame(loop);
-    // 추가적인 재개 관련 작업 수행
   }
 }
 
